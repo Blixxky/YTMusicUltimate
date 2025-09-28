@@ -58,8 +58,15 @@ static BOOL volumeBar = YTMU(@"YTMUltimateIsEnabled") && YTMU(@"volBar");
 %new
 - (void)updateVolBarVisibility {
     if (volumeBar) {
+        // Read the properties into local variables before the dispatch block.
+        // This resolves the "variable length array" error by simplifying what the block needs to capture.
+        BOOL isExpanded = self.isExpanded;
+        long long currentLayout = self.currentLayout;
+        BOOL shouldHide = !(isExpanded && currentLayout == 2);
+
         dispatch_async(dispatch_get_main_queue(), ^(void){
-            self.volumeBar.hidden = !(self.isExpanded && self.currentLayout == 2);
+            // Use the simple local variable within the block.
+            self.volumeBar.hidden = shouldHide;
         });
     }
 }
